@@ -117,7 +117,18 @@ class ClassMethodPrinter
             foreach ($types['params'] as $type) {
                 $varsInMethodSign[] = $type['name'];
                 $stringType = $this->printType($type);
-                $params[] = ((!empty($stringType)) ? $stringType.' ' : '').''.$type['name'].(($type['default'] === null) ? '' : ' = '.$this->dispatcher->p($type['default']));
+
+                /* ToNict */
+                if($stringType == 'bool'){
+                    $stringType = 'boolean';
+                }
+
+                $defaultType = $this->dispatcher->p($type['default']);
+                if($stringType == 'array' && $defaultType == 'null'){
+                     $stringType = 'var';
+                }
+
+                $params[] = ((!empty($stringType)) ? $stringType.' ' : '').''.$type['name'].(($type['default'] === null) ? '' : ' = '.$defaultType);
             }
 
             $stmt .= implode(', ', $params);
@@ -145,7 +156,7 @@ class ClassMethodPrinter
         if (!empty($vars)) {
             $var .= "\n    var ".implode(', ', $vars).";\n";
         }
-        
+
         // dirty...
         Printer\Expr\ArrayDimFetchPrinter::resetCreatedVars();
 
@@ -164,7 +175,12 @@ class ClassMethodPrinter
         if (array_key_exists('return', $types) === false && $this->hasReturnStatement($node) === false) {
             $stmt .= ' -> void';
         } elseif (array_key_exists('return', $types) === true && empty($types['return']['type']['value']) === false) {
-            $stmt .= ' -> '.$this->printType($types['return']);
+            /* ToNict */
+            $return = $this->printType($types['return']);
+            if($return == 'bool') {
+                $return = 'boolean';
+            }
+            $stmt .= ' -> '.$return;
         }
 
         return $stmt;
@@ -199,7 +215,7 @@ class ClassMethodPrinter
 
         foreach ($noFetcher->foreachNodes($node) as &$stmt) {
             if ($stmt['node'] instanceof Expr\Assign) {
-                if (($stmt['node']->var instanceof Expr\PropertyFetch) === false 
+                if (($stmt['node']->var instanceof Expr\PropertyFetch) === false
                  && ($stmt['node']->var instanceof Expr\StaticPropertyFetch) === false
                  && ($stmt['node']->var instanceof Expr\ArrayDimFetch) === false
                  && ($stmt['node']->var instanceof Expr\List_) === false) {
@@ -209,7 +225,7 @@ class ClassMethodPrinter
                 } elseif (($stmt['node']->var instanceof Expr\List_) === true) {
                     $varInList = array();
                     foreach ($stmt['node']->var->vars as $var) {
-                        if (null !== $var) { 
+                        if (null !== $var) {
                             $varInList[] = ucfirst($this->dispatcher->p($var));
                             if (($var instanceof Expr\ArrayDimFetch) === false) {
                                 $vars[] = $this->dispatcher->p($var);
@@ -248,7 +264,7 @@ class ClassMethodPrinter
             } elseif ($stmt['node'] instanceof Arg && $stmt['node']->value instanceof Expr\Array_) {
             	 $vars[] = 'tmpArray'.md5(serialize($stmt['node']->value->items));
             }
-            
+
             if ($stmt['node'] instanceof Expr\ArrayDimFetch && !in_array("PhpParser\Node\Expr\ArrayDimFetch", $stmt['parentClass'])) {
                 $varCreatedInArray = $this->dispatcher->pExpr_ArrayDimFetch($stmt['node'], true);
                 foreach ($varCreatedInArray['vars'] as $var) {

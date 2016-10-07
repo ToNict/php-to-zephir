@@ -88,7 +88,8 @@ class Converter
             return true;
         }
 
-        throw new \Exception(sprintf('interface %s does not exist', $implements));
+        /* ToNict */
+//        throw new \Exception(sprintf('interface %s does not exist', $implements));
     }
 
     /**

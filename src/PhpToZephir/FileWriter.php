@@ -51,7 +51,7 @@ class FileWriter
     "verbose": true
 }
 ';
-    
+
     /**
      * @param array $file
      */
@@ -70,7 +70,7 @@ class FileWriter
             $file['zephir']
         );
     }
-    
+
     /**
      * Create config file for zephir
      *
@@ -78,9 +78,10 @@ class FileWriter
      */
     public function createConfig($namespace)
     {
-        file_put_contents(
-            FileWriter::BASE_DESTINATION . $namespace . strtolower($namespace) . '/config.json',
-            sprintf($this->configTemplate, $namespace, strtolower($namespace))
-        );
+        /* ToNict */
+//        file_put_contents(
+//            FileWriter::BASE_DESTINATION . $namespace . strtolower($namespace) . '/config.json',
+//            sprintf($this->configTemplate, $namespace, strtolower($namespace))
+//        );
     }
 }
