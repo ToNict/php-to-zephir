@@ -124,7 +124,7 @@ class ClassMethodPrinter
                 }
 
                 $defaultType = $this->dispatcher->p($type['default']);
-                if($stringType == 'array' && $defaultType == 'null'){
+                if(($stringType == 'array' || $stringType == 'string') && $defaultType == 'null'){
                      $stringType = 'var';
                 }
 
